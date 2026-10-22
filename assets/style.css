@@ -158,3 +158,4 @@ a[href^="tel:"]{white-space:nowrap}
 .n-more__card{display:grid;grid-template-columns:1fr 96px;align-items:center;min-height:110px;padding:0 var(--n-space-3) 0 0;text-decoration:none;color:var(--n-color-text)}.n-more__card .n-card__body{display:grid;gap:4px;justify-items:start}.n-more__card .n-card__title{font-size:var(--n-fs-lg);font-weight:var(--n-fw-black)}.n-more__card img{width:96px;height:96px;object-fit:cover;border-radius:12px}
 .n-more__h{font-size:var(--n-fs-h2);margin:var(--n-space-6) 0 var(--n-space-3)}
 main.n-pg :is(p,li,label,td) a:not([class*="btn"]):not(.n-tag){text-decoration:underline;text-underline-offset:2px}
+html.m-en .site-nav [lang=en]{display:inline!important;color:inherit;font-size:inherit}html.m-en .brand [lang=en],html.m-en .brand.n-logo [lang=en]{font-size:var(--fs-lg);font-weight:700;color:var(--n-color-text)}.brand.n-logo span{white-space:nowrap}
