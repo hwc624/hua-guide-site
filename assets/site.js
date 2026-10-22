@@ -24,7 +24,18 @@ if(gw){gw.addEventListener('submit',e=>{e.preventDefault();const errs=[];const s
  chk('whatsapp',/^\+?[0-9 ()-]{9,20}$/.test(gw.elements.whatsapp.value.trim()),'WhatsApp 號碼格式不正確 Invalid WhatsApp number');
  chk('consent',gw.elements.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
  document.getElementById('gw-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
- if(!errs.length){st.textContent='上線後開放，資料未送出。 Opens at launch – nothing was sent.';st.hidden=false}});}
+ if(!errs.length)sendForm('giveaway',gw,{name:gw.elements.name.value.trim(),whatsapp:gw.elements.whatsapp.value.trim(),consent:true,marketing:gw.elements.marketing.checked},st)});}
+/* ---------- 送到 Firebase：forms.js 只在按送出時才載入 ---------- */
+function sendForm(kind,form,data,st,file){import(new URL(ASSET+'forms.js',location.href).href).then(m=>m.submit(kind,form,data,st,file)).catch(e=>{console.error(e);st.textContent=window.__lang==='en'?'Could not send – please try again later.':window.__lang==='cn'?'送出失败，请稍后再试。':'送出失敗，請稍後再試。';st.dataset.state='error';st.hidden=false})}
+const adf=document.getElementById('ad-form');
+if(adf){adf.addEventListener('submit',e=>{e.preventDefault();const errs=[];const st=document.getElementById('form-status');st.hidden=true;const E=adf.elements;
+ const chk=(n,ok,msg)=>{E[n].classList.toggle('invalid',!ok);if(!ok)errs.push(msg)};
+ chk('name',E.name.value.trim()!=='','請填姓名 Name is required');chk('business',E.business.value.trim()!=='','請填商家名稱 Business name required');
+ chk('email',/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(E.email.value.trim()),'Email 格式不正確 Invalid email');
+ chk('phone',E.phone.value.trim()===''||/^\+?[0-9 ()-]{7,20}$/.test(E.phone.value.trim()),'電話格式不正確 Invalid phone');
+ chk('consent',E.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
+ document.getElementById('form-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
+ if(!errs.length)sendForm('advertise',adf,{name:E.name.value.trim(),business:E.business.value.trim(),email:E.email.value.trim(),phone:E.phone.value.trim(),plan:E.plan.value,message:E.message.value.trim(),consent:true},st)})}
 const NP=u=>u.replace(/\/$/,'/index.html');const here=NP(location.pathname);document.querySelectorAll('.bottom-nav a, .site-nav a').forEach(a=>{if(NP(new URL(a.href).pathname)===here)a.setAttribute('aria-current','page')});
 const ss=document.getElementById('site-search');
 if(ss){const items=[...document.querySelectorAll('main .card, main .list li, main [data-s]')];ss.addEventListener('input',()=>{const q=ss.value.trim().toLowerCase();let n=0;
@@ -61,7 +72,7 @@ if(ly){const pv=document.getElementById('lyb-preview');ly.elements.photo.addEven
  chk('hours',E.hours.value.trim()!=='','請填營業時間 Hours required');chk('desc',E.desc.value.trim()!=='','請填簡介 Description required');
  chk('consent',E.consent.checked,'請勾選個資書面同意 Please tick the POPIA consent');
  document.getElementById('lyb-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
- if(!errs.length){st.textContent='上線後開放，資料與照片都未送出。 Opens at launch – nothing was sent or uploaded.';st.hidden=false}})}
+ if(!errs.length)sendForm('business',ly,{bname:E.bname.value.trim(),category:E.category.value,address:E.address.value.trim(),phone:E.phone.value.trim(),whatsapp:E.whatsapp.value.trim(),hours:E.hours.value.trim(),desc:E.desc.value.trim(),consent:true},st,E.photo.files[0])})}
 /* ---------- 繁簡切換 (opencc-js, tw→cn, 延遲載入) ---------- */
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
 function loadCss(href){const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l)}

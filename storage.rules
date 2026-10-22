@@ -1,0 +1,13 @@
+rules_version = '2';
+// 公開只能上傳商家照片：JPG/PNG/WebP、小於 5 MB、隨機檔名、不可覆蓋。不能讀、不能刪。
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /uploads/business/{file} {
+      allow create: if file.matches('^[0-9a-f-]{36}\\.(jpg|png|webp)$')
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow read, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /{all=**} { allow read, write: if false; }
+  }
+}

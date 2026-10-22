@@ -1,0 +1,47 @@
+rules_version = '2';
+// 公開訪客只能「新增」，不能讀、改、刪。管理員讀取留給之後的管理頁（admin custom claim）。
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function isAdmin() { return request.auth != null && request.auth.token.admin == true; }
+    function str(f, min, max) { return request.resource.data[f] is string && request.resource.data[f].size() >= min && request.resource.data[f].size() <= max; }
+    function optStr(f, max) { return !request.resource.data.keys().hasAny([f]) || str(f, 0, max); }
+    function tel(f) { return request.resource.data[f].matches('^\\+?[0-9 ()-]{7,20}$'); }
+    function base() {
+      return request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.consent == true
+        && request.resource.data.lang in ['tw', 'cn', 'en'];
+    }
+    match /submissions_business/{id} {
+      allow create: if base()
+        && request.resource.data.keys().hasOnly(['bname','category','address','phone','whatsapp','hours','desc','consent','photoPath','lang','status','createdAt'])
+        && request.resource.data.keys().hasAll(['bname','category','address','phone','hours','desc','consent','lang','status','createdAt'])
+        && str('bname', 1, 120) && request.resource.data.category in ['food','grocery','services','health','other']
+        && str('address', 1, 300) && str('phone', 7, 20) && tel('phone')
+        && optStr('whatsapp', 20) && (request.resource.data.get('whatsapp', '') == '' || tel('whatsapp'))
+        && str('hours', 1, 200) && str('desc', 1, 500)
+        && (!request.resource.data.keys().hasAny(['photoPath']) || (request.resource.data.photoPath is string && request.resource.data.photoPath.matches('^uploads/business/[0-9a-f-]{36}\\.(jpg|png|webp)$')));
+      allow read, update, delete: if isAdmin();
+    }
+    match /submissions_advertise/{id} {
+      allow create: if base()
+        && request.resource.data.keys().hasOnly(['name','business','email','phone','plan','message','consent','lang','status','createdAt'])
+        && request.resource.data.keys().hasAll(['name','business','email','consent','lang','status','createdAt'])
+        && str('name', 1, 100) && str('business', 1, 120)
+        && str('email', 3, 200) && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && optStr('phone', 20) && (request.resource.data.get('phone', '') == '' || tel('phone'))
+        && request.resource.data.get('plan', '') in ['', 'basic', 'standard', 'bundle']
+        && optStr('message', 1000);
+      allow read, update, delete: if isAdmin();
+    }
+    match /submissions_giveaway/{id} {
+      allow create: if base()
+        && request.resource.data.keys().hasOnly(['name','whatsapp','consent','marketing','lang','status','createdAt'])
+        && request.resource.data.keys().hasAll(['name','whatsapp','consent','marketing','lang','status','createdAt'])
+        && str('name', 1, 100) && str('whatsapp', 9, 20) && tel('whatsapp')
+        && request.resource.data.marketing is bool;
+      allow read, update, delete: if isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
