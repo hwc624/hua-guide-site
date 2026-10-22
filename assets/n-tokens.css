@@ -1,0 +1,39 @@
+/* 約堡通 N 霓虹格線 — Design Tokens v1.0（命名穩定，勿改名；新增請加不刪） */
+:root{
+  /* 底色層級 */
+  --n-color-bg:#090B0F; --n-color-surface:#12151B; --n-color-surface-2:#1A1E26; --n-color-border:#232733; --n-color-border-strong:#3A4050;
+  /* 文字 */
+  --n-color-text:#F3F4F6; --n-color-text-muted:#9AA0AA; --n-color-text-disabled:#5C6270; --n-color-on-accent:#111111;
+  /* 品牌 */
+  --n-color-accent:#FBBF24; --n-color-accent-hover:#FCD34D; --n-color-badge:#D6336C; --n-color-badge-glow:#EF4E7B;
+  /* 霓虹分區色（每個 bento 格一色，依序取用） */
+  --n-neon-cyan:#00D4FF; --n-neon-red:#FF375F; --n-neon-violet:#A78BFA; --n-neon-lime:#9EE84B; --n-neon-orange:#FF6B35;
+  /* 分區漸層 */
+  --n-grad-cyan:linear-gradient(160deg,#0B3A5C,#0A1A2B); --n-grad-red:linear-gradient(160deg,#5A0F14,#1E0709);
+  --n-grad-violet:linear-gradient(160deg,#3A1450,#140A1E); --n-grad-lime:linear-gradient(160deg,#0F3D22,#08160D);
+  --n-grad-orange:linear-gradient(160deg,#4A2A08,#1A0F05); --n-grad-hero:linear-gradient(110deg,#0E4C7A,#0A2238 60%,#071421);
+  /* 狀態色 */
+  --n-color-success:#34D399; --n-color-warning:#FBBF24; --n-color-danger:#F87171; --n-color-info:#38BDF8; --n-color-focus:#00D4FF;
+  /* 字型 */
+  --n-font-zh-hant:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Noto Sans CJK TC","Noto Sans TC",sans-serif;
+  --n-font-zh-hans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
+  --n-font-en:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* 字級（手機基準；桌機在斷點放大 display/h1） */
+  --n-fs-xs:11px; --n-fs-sm:13px; --n-fs-base:15px; --n-fs-lg:17px; --n-fs-h3:19px; --n-fs-h2:20px; --n-fs-h1:28px; --n-fs-display:28px;
+  --n-fw-regular:400; --n-fw-bold:700; --n-fw-black:900;
+  --n-lh-tight:1.2; --n-lh-snug:1.35; --n-lh-body:1.6; --n-ls-kicker:.08em;
+  /* 間距 4px 制 */
+  --n-space-1:4px; --n-space-2:8px; --n-space-3:12px; --n-space-4:16px; --n-space-5:20px; --n-space-6:24px; --n-space-8:32px; --n-space-10:40px; --n-space-12:48px;
+  /* 圓角 */
+  --n-radius-sm:6px; --n-radius-md:12px; --n-radius-lg:16px; --n-radius-pill:999px;
+  /* 陰影/光暈 */
+  --n-shadow-card:0 8px 24px rgba(0,0,0,.45); --n-shadow-text:0 2px 10px rgba(0,0,0,.65);
+  --n-glow-accent:0 0 0 1px rgba(251,191,36,.5),0 0 18px rgba(251,191,36,.35);
+  --n-glow-top:linear-gradient(90deg,transparent,var(--n-glow-color,var(--n-neon-cyan)),transparent);
+  /* 版面 */
+  --n-container:1240px; --n-header-h:96px; --n-bottomnav-h:64px; --n-tap-min:44px;
+  /* 斷點（CSS 變數不能用在 media query，僅供 JS 讀取；CSS 請寫 600/900/1240） */
+  --n-bp-sm:600px; --n-bp-md:900px; --n-bp-lg:1240px;
+}
+@media (min-width:900px){:root{--n-fs-h1:36px;--n-fs-display:46px;--n-fs-h3:24px}}
+:lang(zh-Hans){font-family:var(--n-font-zh-hans)} :lang(en){font-family:var(--n-font-en)}

@@ -20,10 +20,10 @@ if(gw){gw.addEventListener('submit',e=>{e.preventDefault();const errs=[];const s
  chk('consent',gw.elements.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
  document.getElementById('gw-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
  if(!errs.length){st.textContent='上線後開放，資料未送出。 Opens at launch – nothing was sent.';st.hidden=false}});}
-const here=location.pathname.split('/').pop()||'index.html';document.querySelectorAll('.bottom-nav a').forEach(a=>{if(a.getAttribute('href').split('/').pop()===here)a.setAttribute('aria-current','page')});
+const NP=u=>u.replace(/\/$/,'/index.html');const here=NP(location.pathname);document.querySelectorAll('.bottom-nav a, .site-nav a').forEach(a=>{if(NP(new URL(a.href).pathname)===here)a.setAttribute('aria-current','page')});
 const cq=new URLSearchParams(location.search).get('cat');if(cq){const c=document.querySelector(`.chip[data-filter="${cq}"]`);if(c)c.click()}
 const ss=document.getElementById('site-search');
-if(ss){const items=[...document.querySelectorAll('main .card, main .list li')];ss.addEventListener('input',()=>{const q=ss.value.trim().toLowerCase();let n=0;
+if(ss){const items=[...document.querySelectorAll('main .card, main .list li, main [data-s]')];ss.addEventListener('input',()=>{const q=ss.value.trim().toLowerCase();let n=0;
  items.forEach(el=>{const show=!q||el.textContent.toLowerCase().includes(q);el.hidden=!show;if(show)n++});
  document.getElementById('search-count').textContent=q?(window.__lang==='en'?`${n} result(s)`:`找到 ${n} 筆 · ${n} result(s)`):''})}
 const ASSET=(document.querySelector('script[src$="site.js"]').getAttribute('src')).replace(/site\.js$/,'');
