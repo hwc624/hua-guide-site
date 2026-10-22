@@ -187,3 +187,13 @@ html.m-en .n-catgrid__item{font-size:var(--n-fs-base)}
 .n-hero__title{font-size:calc(var(--n-fs-display)*1.3);overflow-wrap:anywhere}.n-hero__text{font-size:var(--n-fs-lg);line-height:var(--n-lh-normal,1.45)}
 @media(min-width:900px){.n-hero__text{font-size:var(--n-fs-h2)}}
 @media(min-width:768px){.n-hero__body>*{max-width:640px}}
+/* p5: bigger header logo (shared header, all pages) */
+.brand.n-logo{padding-right:0;margin-right:calc(var(--n-space-4) + 126px);min-width:0}
+.brand.n-logo [lang],html.m-en .brand.n-logo [lang=en]{font-weight:var(--n-fw-black);color:var(--n-color-text);line-height:1.15}
+.brand.n-logo [lang^=zh]{font-size:min(28px,calc((100vw - 174px)/8))}
+html.m-en .brand.n-logo [lang=en]{font-size:min(28px,calc((100vw - 174px)/12))}
+@media(min-width:900px){.brand.n-logo{margin-right:0;flex:none}.brand.n-logo [lang^=zh],html.m-en .brand.n-logo [lang=en]{font-size:calc(var(--fs-lg)*3)}
+ .site-header.n-header{flex-wrap:wrap;row-gap:var(--n-space-2);padding-right:calc(126px + var(--n-space-6))}.lang-switch{top:50%;transform:translateY(-50%)}}
+/* p5: drop duplicated site name next to homepage search (kept for screen readers as the page h1) */
+.n-intro__title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:0}
+.n-intro__search{flex:1;max-width:none;width:100%}
