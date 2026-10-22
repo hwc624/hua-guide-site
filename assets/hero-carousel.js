@@ -25,7 +25,7 @@ slides.forEach(function(s,k){s.setAttribute('role','group');s.setAttribute('aria
 var dots=[].slice.call(dotsEl.children),cur=0;
 function go(k,user){cur=(k+n)%n;slides.forEach(function(s,j){var on=j===cur;s.classList.toggle('is-active',on);s.setAttribute('aria-hidden',on?'false':'true');s.inert=!on});
  dots.forEach(function(d,j){d.setAttribute('aria-current',j===cur?'true':'false')});root.dataset.index=cur;if(user)restart()}
-var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,playing=!reduce,hover=false,focus=false,timer=null,DELAY=6000;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,playing=true,hover=false,focus=false,timer=null,DELAY=3000;
 function running(){return playing&&!hover&&!focus&&!document.hidden}
 function restart(){clearInterval(timer);timer=null;if(running())timer=setInterval(function(){go(cur+1)},DELAY);track.setAttribute('aria-live',running()?'off':'polite')}
 function setPlay(p){playing=p;playB.setAttribute('aria-label',p?T.pause:T.play);playB.textContent=p?'❚❚':'▶';restart()}
@@ -33,7 +33,7 @@ ctl.querySelector('.n-hero__btn--prev').addEventListener('click',function(){go(c
 ctl.querySelector('.n-hero__btn--next').addEventListener('click',function(){go(cur+1,true)});
 playB.addEventListener('click',function(){setPlay(!playing)});
 root.addEventListener('mouseenter',function(){hover=true;restart()});root.addEventListener('mouseleave',function(){hover=false;restart()});
-root.addEventListener('focusin',function(){focus=true;restart()});root.addEventListener('focusout',function(e){if(!root.contains(e.relatedTarget)){focus=false;restart()}});
+root.addEventListener('focusin',function(e){if(e.target.matches(':focus-visible')){focus=true;restart()}});root.addEventListener('focusout',function(e){if(!root.contains(e.relatedTarget)){focus=false;restart()}});
 document.addEventListener('visibilitychange',restart);
 root.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){go(cur-1,true);e.preventDefault()}else if(e.key==='ArrowRight'){go(cur+1,true);e.preventDefault()}});
 var x0=null,y0=0;track.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
