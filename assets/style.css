@@ -183,3 +183,7 @@ html.m-en .n-catgrid__item{font-size:var(--n-fs-base)}
 .dir-toolbar .view-toggle,.dir-toolbar .filters{flex-wrap:nowrap;margin:0;flex:none}
 .dir-toolbar .view-toggle{padding-right:var(--n-space-2);border-right:1px solid var(--n-color-border)}
 .dir-toolbar .chip{white-space:nowrap;flex:none}
+/* p4: larger carousel title/body */
+.n-hero__title{font-size:calc(var(--n-fs-display)*1.3);overflow-wrap:anywhere}.n-hero__text{font-size:var(--n-fs-lg);line-height:var(--n-lh-normal,1.45)}
+@media(min-width:900px){.n-hero__text{font-size:var(--n-fs-h2)}}
+@media(min-width:768px){.n-hero__body>*{max-width:640px}}
