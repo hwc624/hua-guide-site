@@ -178,3 +178,8 @@ html.m-en .n-catgrid__item{font-size:var(--n-fs-base)}
 .catbar__clear{margin-left:auto;color:var(--n-color-accent);text-decoration:underline;min-height:var(--n-tap-min);display:inline-flex;align-items:center}
 .dir-empty{text-align:center;padding:var(--n-space-8) var(--n-space-4);border:1px dashed var(--n-color-border);border-radius:var(--n-radius-md);margin:var(--n-space-4) 0}
 .dir-empty .catbar__clear{margin-left:var(--n-space-3)}
+/* p3: view toggle + category chips on one row */
+.dir-toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:var(--n-space-2);margin:var(--n-space-4) 0;overflow-x:auto;scrollbar-width:thin;padding:2px 2px var(--n-space-1)}
+.dir-toolbar .view-toggle,.dir-toolbar .filters{flex-wrap:nowrap;margin:0;flex:none}
+.dir-toolbar .view-toggle{padding-right:var(--n-space-2);border-right:1px solid var(--n-color-border)}
+.dir-toolbar .chip{white-space:nowrap;flex:none}
