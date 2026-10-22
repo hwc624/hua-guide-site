@@ -1,16 +1,21 @@
-document.querySelectorAll('.chip[data-filter]').forEach(b=>b.addEventListener('click',()=>{
- document.querySelectorAll('.chip[data-filter]').forEach(c=>c.classList.toggle('active',c===b));const f=b.dataset.filter;
- document.querySelectorAll('#dir .biz').forEach(c=>{c.hidden=!(f==='all'||c.dataset.cat===f)})}));
-const form=document.getElementById('ad-form');
-if(form){form.addEventListener('submit',e=>{e.preventDefault();const errs=[];const st=document.getElementById('form-status');st.hidden=true;
- const chk=(n,ok,msg)=>{const el=form.elements[n];el.classList.toggle('invalid',!ok);if(!ok)errs.push(msg)};
- chk('name',form.name.value.trim()!=='','請填姓名 Name is required');
- chk('business',form.business.value.trim()!=='','請填商家名稱 Business is required');
- chk('email',/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.value.trim()),'Email 格式不正確 Invalid email');
- chk('phone',form.phone.value.trim()===''||/^[+0-9 ()-]{7,20}$/.test(form.phone.value.trim()),'電話格式不正確 Invalid phone');
- chk('consent',form.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
- document.getElementById('form-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
- if(!errs.length){st.textContent='原型，尚未連線：資料未送出。 Prototype, not connected: nothing was sent.';st.hidden=false}});}
+/* ---------- 目錄篩選：大類 chip (food/services/other) + 細分類 ?cat= ---------- */
+const DIR_SUBS={health:'services',beauty:'services',dining:'food',groceries:'food',legal:'services',finance:'services',home:'services',education:'other'};
+const DIR_GROUPS=['food','services','other'];let dirF={t:'all'};
+function dirMatch(cat,sub){return dirF.t==='all'||(dirF.t==='group'?cat===dirF.k:sub===dirF.k)}
+function applyDir(push){const dir=document.getElementById('dir');if(!dir)return;let n=0;
+ dir.querySelectorAll('.biz').forEach(c=>{const ok=dirMatch(c.dataset.cat,c.dataset.sub);c.hidden=!ok;if(ok)n++});
+ const g=dirF.t==='all'?'all':dirF.t==='group'?dirF.k:null;
+ document.querySelectorAll('.chip[data-filter]').forEach(c=>{const on=c.dataset.filter===g;c.classList.toggle('active',on);c.setAttribute('aria-pressed',on)});
+ const bar=document.getElementById('catbar');if(bar){bar.hidden=dirF.t!=='sub';bar.querySelectorAll('.catbar__name').forEach(e=>e.hidden=e.dataset.k!==dirF.k);
+  const cc=document.getElementById('catcount');if(cc)cc.textContent='('+n+')'}
+ const em=document.getElementById('dir-empty');if(em)em.hidden=n>0;
+ if(typeof syncPins==='function')syncPins();
+ if(push){const u=new URL(location.href);if(dirF.t==='all')u.searchParams.delete('cat');else u.searchParams.set('cat',dirF.k);history.replaceState(null,'',u)}}
+document.querySelectorAll('.chip[data-filter]').forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.filter;dirF=f==='all'?{t:'all'}:{t:'group',k:f};applyDir(true)}));
+document.querySelectorAll('#catclear').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();dirF={t:'all'};applyDir(true)}));
+{const cq=(new URLSearchParams(location.search).get('cat')||'').toLowerCase();
+ if(DIR_SUBS[cq])dirF={t:'sub',k:cq};else if(DIR_GROUPS.includes(cq))dirF={t:'group',k:cq};
+ if(document.getElementById('dir')){applyDir(false);if(cq&&dirF.t==='all'){const u=new URL(location.href);u.searchParams.delete('cat');history.replaceState(null,'',u)}}}
 const wa=document.getElementById('wa-share');if(wa)wa.href='https://wa.me/?text='+encodeURIComponent(document.title+' '+location.href);
 const gw=document.getElementById('gw-form');
 if(gw){gw.addEventListener('submit',e=>{e.preventDefault();const errs=[];const st=document.getElementById('gw-status');st.hidden=true;
@@ -21,7 +26,6 @@ if(gw){gw.addEventListener('submit',e=>{e.preventDefault();const errs=[];const s
  document.getElementById('gw-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
  if(!errs.length){st.textContent='上線後開放，資料未送出。 Opens at launch – nothing was sent.';st.hidden=false}});}
 const NP=u=>u.replace(/\/$/,'/index.html');const here=NP(location.pathname);document.querySelectorAll('.bottom-nav a, .site-nav a').forEach(a=>{if(NP(new URL(a.href).pathname)===here)a.setAttribute('aria-current','page')});
-const cq=new URLSearchParams(location.search).get('cat');if(cq){const c=document.querySelector(`.chip[data-filter="${cq}"]`);if(c)c.click()}
 const ss=document.getElementById('site-search');
 if(ss){const items=[...document.querySelectorAll('main .card, main .list li, main [data-s]')];ss.addEventListener('input',()=>{const q=ss.value.trim().toLowerCase();let n=0;
  items.forEach(el=>{const show=!q||el.textContent.toLowerCase().includes(q);el.hidden=!show;if(show)n++});
@@ -90,13 +94,14 @@ if(LANG==='en'){enTree(document.body);enAttrs(document);document.title=stripCJK(
  new MutationObserver(ms=>ms.forEach(m=>{if(m.type==='characterData')enNode(m.target);else m.addedNodes.forEach(n=>{if(n.nodeType===3)enNode(n);else if(n.nodeType===1)enTree(n)})})).observe(document.body,{subtree:true,childList:true,characterData:true})}
 if(LANG==='cn')toSimplified();
 /* ---------- 地圖 (Leaflet + OSM, 延遲載入) ---------- */
-const mapWrap=document.getElementById('map-wrap');let mapObj=null;
-const SAMPLE_PINS=[[-26.1076,28.0567,'<span lang="zh-Hant-TW">範例川菜館</span><span lang="en">Sample Sichuan Kitchen</span>'],[-26.1450,28.0410,'<span lang="zh-Hant-TW">範例亞洲超市</span><span lang="en">Sample Asian Supermarket</span>'],[-26.1900,28.0300,'<span lang="zh-Hant-TW">範例生活服務</span><span lang="en">Sample services</span>']]; // 範例位置，非真實店址 sample only
+const mapWrap=document.getElementById('map-wrap');var mapObj=null,PINS=[];
+function syncPins(){if(!mapObj)return;PINS.forEach(m=>{const ok=dirMatch(m._hg[0],m._hg[1]);if(ok&&!mapObj.hasLayer(m))m.addTo(mapObj);else if(!ok&&mapObj.hasLayer(m))mapObj.removeLayer(m)})}
+const SAMPLE_PINS=[[-26.1076,28.0567,'food','dining','<span lang="zh-Hant-TW">範例川菜館</span><span lang="en">Sample Sichuan Kitchen</span>'],[-26.1450,28.0410,'food','groceries','<span lang="zh-Hant-TW">範例亞洲超市</span><span lang="en">Sample Asian Supermarket</span>'],[-26.1900,28.0300,'services','','<span lang="zh-Hant-TW">範例生活服務</span><span lang="en">Sample services</span>']]; // 範例位置，非真實店址 sample only
 async function showMap(){mapWrap.hidden=false;document.getElementById('dir').hidden=true;
  if(!mapObj){loadCss(ASSET+'vendor/leaflet/leaflet.css');await loadScript(ASSET+'vendor/leaflet/leaflet.js');
   mapObj=L.map('map').setView([-26.15,28.04],11);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(mapObj);
-  SAMPLE_PINS.forEach(([a,b,n])=>L.marker([a,b]).addTo(mapObj).bindPopup(`${n}<br><b lang="zh-Hant-TW">範例位置，非真實店址</b><br lang="zh-Hant-TW"><span lang="en">Sample location, not a real address</span>`))}
+  SAMPLE_PINS.forEach(([a,b,c,sb,n])=>{const m=L.marker([a,b]);m._hg=[c,sb];PINS.push(m);m.bindPopup(`${n}<br><b lang="zh-Hant-TW">範例位置，非真實店址</b><br lang="zh-Hant-TW"><span lang="en">Sample location, not a real address</span>`)});syncPins()}
  else mapObj.invalidateSize()}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));
  if(b.dataset.view==='map')showMap();else{mapWrap.hidden=true;document.getElementById('dir').hidden=false}}));
