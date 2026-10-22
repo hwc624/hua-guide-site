@@ -1,1 +1,6 @@
 screenshots/
+node_modules/
+*.log
+.DS_Store
+test-results/
+*.tmp

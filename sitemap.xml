@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 網域 https://example.co.za 為待定佔位 · domain TBD -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.co.za/advertise.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/deals.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/directory.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/giveaway.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/guides/chinese-groceries.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/guides/</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/guides/load-shedding-solar.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/guides/newcomer-checklist.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/life.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/list-your-business.html</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://example.co.za/privacy.html</loc><lastmod>2026-10-22</lastmod></url>
+</urlset>
