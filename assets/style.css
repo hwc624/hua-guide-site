@@ -197,3 +197,7 @@ html.m-en .brand.n-logo [lang=en]{font-size:min(28px,calc((100vw - 174px)/12))}
 /* p5: drop duplicated site name next to homepage search (kept for screen readers as the page h1) */
 .n-intro__title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:0}
 .n-intro__search{flex:1;max-width:none;width:100%}
+/* p6: desktop logo sized so logo + nav + language switch stay on one row (17px scrollbar allowance) */
+@media(min-width:900px){.site-header.n-header{flex-wrap:nowrap}.site-nav{flex:none}
+ .brand.n-logo [lang^=zh]{font-size:min(calc(var(--fs-lg)*3),calc((100vw - 560px)/8))}
+ html.m-en .brand.n-logo [lang=en]{font-size:min(calc(var(--fs-lg)*3),calc((100vw - 630px)/12))}}
