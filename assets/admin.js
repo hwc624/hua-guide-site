@@ -223,6 +223,7 @@ $('#tabs').innerHTML = TABS.map(([k, l]) => `<button type="button" data-tab="${k
 $('#tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); };
 $('#login-form').onsubmit = async e => { e.preventDefault(); const f = e.target.elements; $('#login-msg').textContent = ''; try { await A.signInWithEmailAndPassword(auth, f.email.value.trim(), f.password.value); } catch (err) { $('#login-msg').textContent = '登入失敗：' + (err.code || err.message); } };
 $('#google').onclick = async () => { try { await A.signInWithPopup(auth, new A.GoogleAuthProvider()); } catch (err) { $('#login-msg').textContent = '登入失敗：' + (err.code || err.message); } };
+$('#signup').onclick = async () => { const f = $('#login-form').elements; $('#login-msg').textContent = ''; if (!f.email.value.trim() || f.password.value.length < 8) { $('#login-msg').textContent = '請先填 Email 和至少 8 個字元的密碼。'; return; } try { await A.createUserWithEmailAndPassword(auth, f.email.value.trim(), f.password.value); } catch (err) { $('#login-msg').textContent = '建立失敗：' + (err.code || err.message); } };
 $('#logout').onclick = () => A.signOut(auth);
 A.onAuthStateChanged(auth, async u => {
   me = u; role = null; $('#logout').hidden = !u; $('#who').textContent = u ? (u.email || u.uid) : '';
