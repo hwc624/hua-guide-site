@@ -3,3 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /stats-demo.html
 Sitemap: https://example.co.za/sitemap.xml
+Disallow: /admin.html

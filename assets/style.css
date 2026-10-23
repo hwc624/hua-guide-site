@@ -202,3 +202,10 @@ html.m-en .brand.n-logo [lang=en]{font-size:min(28px,calc((100vw - 174px)/12))}
  .brand.n-logo [lang^=zh]{font-size:min(calc(var(--fs-lg)*3),calc((100vw - 560px)/8))}
  html.m-en .brand.n-logo [lang=en]{font-size:min(calc(var(--fs-lg)*3),calc((100vw - 630px)/12))}}
 .hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* ---------- 管理頁內容 CMS（cms.js 插入） ---------- */
+.cms-banner{display:block;margin:var(--n-space-3) 0;padding:var(--n-space-3) var(--n-space-4);border-radius:var(--n-radius-md);background:var(--n-color-surface-2);border:1px solid var(--n-color-info);color:var(--n-color-text);font-size:var(--n-fs-base);text-decoration:none}
+a.cms-banner:hover{border-color:var(--n-color-accent)}
+.cms-banner--warn{border-color:var(--n-color-warning);font-weight:var(--n-fw-bold)}
+.cms-closed{padding:var(--n-space-10) var(--n-space-4);text-align:center}
+.cms-closed p{color:var(--n-color-text-muted);margin:var(--n-space-4) 0}

@@ -38,7 +38,7 @@ if(adf){adf.addEventListener('submit',e=>{e.preventDefault();const errs=[];const
  if(!errs.length)sendForm('advertise',adf,{name:E.name.value.trim(),business:E.business.value.trim(),email:E.email.value.trim(),phone:E.phone.value.trim(),plan:E.plan.value,message:E.message.value.trim(),consent:true},st)})}
 const NP=u=>u.replace(/\/$/,'/index.html');const here=NP(location.pathname);document.querySelectorAll('.bottom-nav a, .site-nav a').forEach(a=>{if(NP(new URL(a.href).pathname)===here)a.setAttribute('aria-current','page')});
 const ss=document.getElementById('site-search');
-if(ss){const items=[...document.querySelectorAll('main .card, main .list li, main [data-s]')];ss.addEventListener('input',()=>{const q=ss.value.trim().toLowerCase();let n=0;
+if(ss){ss.addEventListener('input',()=>{const items=[...document.querySelectorAll('main .card, main .list li, main [data-s]')];/* 每次重抓：cms.js 可能已換掉內容 */const q=ss.value.trim().toLowerCase();let n=0;
  items.forEach(el=>{const show=!q||el.textContent.toLowerCase().includes(q);el.hidden=!show;if(show)n++});
  document.getElementById('search-count').textContent=q?(window.__lang==='en'?`${n} result(s)`:`找到 ${n} 筆 · ${n} result(s)`):''})}
 const ASSET=(document.querySelector('script[src$="site.js"]').getAttribute('src')).replace(/site\.js$/,'');
@@ -84,6 +84,7 @@ async function toSimplified(){const t0=performance.now();await loadScript(ASSET+
  document.title=conv(document.title);document.documentElement.lang='zh-Hans';document.querySelectorAll('[data-lang]').forEach(b=>{if(b.dataset.lang==='tw')b.textContent='繁'});
  document.querySelectorAll('[lang="zh-Hant-TW"]').forEach(e=>e.lang='zh-Hans');
  const t2=performance.now();window.__zh={loadMs:t1-t0,convertMs:t2-t1,nodes:nodes.length};
+ window.__hgConvert=root=>{const w2=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);while(w2.nextNode()){const n=w2.currentNode;if(CJK.test(n.nodeValue))n.nodeValue=conv(n.nodeValue)}root.querySelectorAll&&root.querySelectorAll('[lang="zh-Hant-TW"]').forEach(e=>e.lang='zh-Hans')};
  }
 /* ---------- 三語切換 繁 / 简 / EN ----------
  * localStorage key hg_lang = tw | cn | en（舊 key hg_zh 自動遷移後刪除）。
@@ -103,7 +104,10 @@ function enTree(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEX
 if(LANG==='en'){enTree(document.body);enAttrs(document);document.title=stripCJK(document.title).trim();
  const md=document.querySelector('meta[name=description]');if(md)md.content=stripCJK(md.content).trim();
  new MutationObserver(ms=>ms.forEach(m=>{if(m.type==='characterData')enNode(m.target);else m.addedNodes.forEach(n=>{if(n.nodeType===3)enNode(n);else if(n.nodeType===1)enTree(n)})})).observe(document.body,{subtree:true,childList:true,characterData:true})}
-if(LANG==='cn')toSimplified();
+/* cms.js 動態插入內容後呼叫 __hgRelang(root)：EN 由 MutationObserver 處理，簡體在這裡轉。 */
+window.__hgCnReady=LANG==='cn'?toSimplified():Promise.resolve();
+window.__hgRelang=root=>{if(LANG==='cn')window.__hgCnReady.then(()=>window.__hgConvert&&window.__hgConvert(root))};
+window.__hgApplyDir=()=>applyDir(false);
 /* ---------- 地圖 (Leaflet + OSM, 延遲載入) ---------- */
 const mapWrap=document.getElementById('map-wrap');var mapObj=null,PINS=[];
 function syncPins(){if(!mapObj)return;PINS.forEach(m=>{const ok=dirMatch(m._hg[0],m._hg[1]);if(ok&&!mapObj.hasLayer(m))m.addTo(mapObj);else if(!ok&&mapObj.hasLayer(m))mapObj.removeLayer(m)})}

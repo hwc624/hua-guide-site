@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>管理後台 | 約堡華人好康網</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/n-tokens.css"><link rel="stylesheet" href="assets/admin.css"></head><body>
+<header class="ad-head"><strong>約堡華人好康網・管理後台</strong><span id="who"></span><button type="button" id="logout" hidden>登出</button></header>
+<section id="login" class="ad-card ad-login">
+ <h1>管理員登入</h1>
+ <form id="login-form"><label>Email<input name="email" type="email" autocomplete="username" required></label>
+ <label>密碼<input name="password" type="password" autocomplete="current-password" required></label>
+ <button type="submit">登入</button></form>
+ <p class="ad-or">或</p><button type="button" id="google">用 Google 帳號登入</button>
+ <p id="login-msg" class="ad-msg" role="alert"></p>
+</section>
+<div id="app" hidden>
+ <nav class="ad-tabs" id="tabs" aria-label="管理項目"></nav>
+ <main id="view" class="ad-main"></main>
+</div>
+<dialog id="dlg"><form method="dialog" id="dlg-form"><h2 id="dlg-title"></h2><div id="dlg-body"></div><p id="dlg-msg" class="ad-msg" role="alert"></p>
+ <div class="ad-row"><button type="submit" value="save" id="dlg-save">儲存</button><button type="button" id="dlg-cancel" class="ghost">取消</button></div></form></dialog>
+<datalist id="imgs"></datalist>
+<script type="module" src="assets/admin.js"></script></body></html>

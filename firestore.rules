@@ -1,8 +1,16 @@
 rules_version = '2';
-// 公開訪客只能「新增」，不能讀、改、刪。管理員讀取留給之後的管理頁（admin custom claim）。
+// 送件：公開訪客只能「新增」，不能讀、改、刪；管理員可讀、改（審核）、刪。
+// 網站內容（site / merchants / slides / deals / articles）：公開只能讀「已發布／啟用」的；只有管理員能寫，且必須帶 updatedAt / updatedBy 稽核欄位。
+// 管理員 = custom claim admin==true（視為 owner），或 admins/{uid} 文件（role: owner | editor）。
 service cloud.firestore {
   match /databases/{db}/documents {
-    function isAdmin() { return request.auth != null && request.auth.token.admin == true; }
+    function signedIn() { return request.auth != null; }
+    function adminDoc() { return get(/databases/$(db)/documents/admins/$(request.auth.uid)); }
+    function hasAdminDoc() { return signedIn() && exists(/databases/$(db)/documents/admins/$(request.auth.uid)); }
+    function isOwner() { return signedIn() && (request.auth.token.admin == true || (hasAdminDoc() && adminDoc().data.role == 'owner')); }
+    function isAdmin() { return signedIn() && (request.auth.token.admin == true || (hasAdminDoc() && adminDoc().data.role in ['owner', 'editor'])); }
+    function audited() { return request.resource.data.updatedBy == request.auth.uid && request.resource.data.updatedAt == request.time; }
+    function contentWrite() { return isAdmin() && audited() && request.resource.data.size() <= 60; }
     function str(f, min, max) { return request.resource.data[f] is string && request.resource.data[f].size() >= min && request.resource.data[f].size() <= max; }
     function optStr(f, max) { return !request.resource.data.keys().hasAny([f]) || str(f, 0, max); }
     function tel(f) { return request.resource.data[f].matches('^\\+?[0-9 ()-]{7,20}$'); }
@@ -21,7 +29,8 @@ service cloud.firestore {
         && optStr('whatsapp', 20) && (request.resource.data.get('whatsapp', '') == '' || tel('whatsapp'))
         && str('hours', 1, 200) && str('desc', 1, 500)
         && (!request.resource.data.keys().hasAny(['photoPath']) || (request.resource.data.photoPath is string && request.resource.data.photoPath.matches('^uploads/business/[0-9a-f-]{36}\\.(jpg|png|webp)$')));
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if reviewOnly();
     }
     match /submissions_advertise/{id} {
       allow create: if base()
@@ -32,7 +41,8 @@ service cloud.firestore {
         && optStr('phone', 20) && (request.resource.data.get('phone', '') == '' || tel('phone'))
         && request.resource.data.get('plan', '') in ['', 'basic', 'standard', 'bundle']
         && optStr('message', 1000);
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if reviewOnly();
     }
     match /submissions_giveaway/{id} {
       allow create: if base()
@@ -40,7 +50,45 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll(['name','whatsapp','consent','marketing','lang','status','createdAt'])
         && str('name', 1, 100) && str('whatsapp', 9, 20) && tel('whatsapp')
         && request.resource.data.marketing is bool;
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if reviewOnly();
+    }
+    // 審核：只能改 status / note / reviewedAt / reviewedBy / merchantId，原始送件內容不可改
+    function reviewOnly() {
+      return isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'reviewedAt', 'reviewedBy', 'merchantId'])
+        && request.resource.data.status in ['pending', 'approved', 'rejected']
+        && request.resource.data.reviewedBy == request.auth.uid && request.resource.data.reviewedAt == request.time;
+    }
+    match /site/{docId} {
+      allow read: if true;
+      allow create, update: if contentWrite() && docId in ['settings', 'advertise', 'giveaway'];
+      allow delete: if isOwner();
+    }
+    match /merchants/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update: if contentWrite() && request.resource.data.published is bool && request.resource.data.name.tw is string;
+      allow delete: if isAdmin();
+    }
+    match /slides/{id} {
+      allow read: if resource.data.enabled == true || isAdmin();
+      allow create, update: if contentWrite() && request.resource.data.enabled is bool;
+      allow delete: if isAdmin();
+    }
+    match /deals/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update: if contentWrite() && request.resource.data.published is bool;
+      allow delete: if isAdmin();
+    }
+    match /articles/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update: if contentWrite() && request.resource.data.published is bool && request.resource.data.page in ['life', 'guides'];
+      allow delete: if isAdmin();
+    }
+    // 管理員名單：本人可讀自己的（知道自己角色）；只有 owner 能新增／改／刪
+    match /admins/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isOwner();
+      allow create, update: if isOwner() && request.resource.data.role in ['owner', 'editor'] && audited();
+      allow delete: if isOwner() && uid != request.auth.uid;
     }
     match /{document=**} { allow read, write: if false; }
   }
