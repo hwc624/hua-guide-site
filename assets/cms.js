@@ -7,7 +7,7 @@ var ME=document.currentScript||document.querySelector('script[src$="cms.js"]');
 var ASSET=ME.getAttribute('src').replace(/cms\.js.*$/,''),ROOT=ASSET.replace(/assets\/$/,'');
 var EMU=/^(127\.0\.0\.1|localhost)$/.test(location.hostname)&&new URLSearchParams(location.search).has('emu');
 /* ⚠️ 正式站開關：部署 firestore.rules 並在管理頁匯入初始資料之後才改成 true。false 時正式站完全不連 Firestore，只用 HTML 靜態內容。 */
-var PROD_ENABLED=false;
+var PROD_ENABLED=true;
 var NOCMS=new URLSearchParams(location.search).has('nocms')||(!EMU&&!PROD_ENABLED);
 var PROJECT=EMU?'demo-hua-guide':'hua-guide-haokang',KEY='AIzaSyCLmmOYAQG0fbFU2x5HqFM9WjrAEhej8OU';
 var BASE=(EMU?'http://127.0.0.1:8080':'https://firestore.googleapis.com')+'/v1/projects/'+PROJECT+'/databases/(default)/documents';
