@@ -49,12 +49,13 @@ const ASSET=(document.querySelector('script[src$="site.js"]').getAttribute('src'
  *  - Cloudflare Web Analytics：只有頁面瀏覽，無自訂事件；需事件時改用 Cloudflare Zaraz 的 zaraz.track(event, props)
  * 原型：只寫入 localStorage（key hg_events），不發任何網路請求。
  * 停用的按鈕（disabled）瀏覽器不會觸發 click，因此不會被記錄。 */
-function sendRemote(event,props){/* 上線時接 Plausible / Zaraz，原型不做任何事 */}
+/* 商家統計：有 data-cms-id 的商家卡片點擊 → stats.js（Firestore 匿名計數，無個資）。stats.js 載入前先排隊。 */
+window.__hgQ=window.__hgQ||[];function sendRemote(event,props){if(props.id&&/^click_(whatsapp|call|website)$/.test(event))window.__hgQ.push([props.id,event])}
 function track(event,props={}){try{const k='hg_events',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({e:event,p:props,t:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(-1000)))}catch(_){}sendRemote(event,props)}
 window.track=track;
 document.addEventListener('click',e=>{const el=e.target.closest('[data-track]');if(!el||el.disabled)return;
  const card=el.closest('article');const biz=el.dataset.biz||(card&&card.querySelector('h2,h3')?card.querySelector('h2,h3').textContent.trim():'(未知)');
- track('click_'+el.dataset.track,{biz,kind:el.dataset.track,page:location.pathname.split('/').pop()||'index.html'})});
+ const host=el.closest('[data-cms-id]');track('click_'+el.dataset.track,{biz,id:host&&!host.closest('.n-hero')?host.dataset.cmsId:'',kind:el.dataset.track,page:location.pathname.split('/').pop()||'index.html'})});
 const stT=document.getElementById('stats-table');
 function renderStats(){const ev=JSON.parse(localStorage.getItem('hg_events')||'[]');const kinds=['whatsapp','call','directions','website','share'];const m={};
  ev.forEach(x=>{const b=x.p.biz||'?';m[b]=m[b]||{};m[b][x.p.kind]=(m[b][x.p.kind]||0)+1});
@@ -118,5 +119,9 @@ async function showMap(){mapWrap.hidden=false;document.getElementById('dir').hid
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(mapObj);
   SAMPLE_PINS.forEach(([a,b,c,sb,n])=>{const m=L.marker([a,b]);m._hg=[c,sb];PINS.push(m);m.bindPopup(`${n}<br><b lang="zh-Hant-TW">範例位置，非真實店址</b><br lang="zh-Hant-TW"><span lang="en">Sample location, not a real address</span>`)});syncPins()}
  else mapObj.invalidateSize()}
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});
  if(b.dataset.view==='map')showMap();else{mapWrap.hidden=true;document.getElementById('dir').hidden=false}}));
+
+/* 商家曝光／點擊統計（stats.js）與 GoatCounter 瀏覽次數（analytics.js），延遲載入 */
+document.addEventListener('hg:cms',()=>{if(document.querySelector('.biz[data-cms-id], .n-card--merchant[data-cms-id]'))loadScript(ASSET+'stats.js').catch(()=>{})});
+loadScript(ASSET+'analytics.js').catch(()=>{});

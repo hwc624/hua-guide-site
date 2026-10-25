@@ -30,3 +30,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .ad-list-item{border:1px dashed var(--n-color-border-strong);border-radius:var(--n-radius-sm);padding:var(--n-space-2);margin:var(--n-space-2) 0}
 .ad-sub{display:grid;gap:4px}.ad-kv{font-size:var(--n-fs-sm)}.ad-kv b{color:var(--n-color-text-muted);font-weight:normal}
 fieldset{border:1px solid var(--n-color-border);border-radius:var(--n-radius-md);margin:var(--n-space-4) 0;padding:var(--n-space-3)}legend{padding:0 6px;font-weight:var(--n-fw-bold)}
+/* 商家統計 */
+.st-bar button[aria-pressed=true]{font-weight:700}.st-wrap{overflow-x:auto}.st-wrap table{min-width:720px}
+#st-table tr[aria-selected=true]{background:rgba(34,211,238,.12)}.linkish{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
+.st-grid{display:grid;gap:16px;margin-top:16px}@media(min-width:1000px){.st-grid{grid-template-columns:1fr 1fr}}.st-chart{width:100%;height:auto;color:inherit}

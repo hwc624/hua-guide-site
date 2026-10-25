@@ -58,7 +58,8 @@ function applySettings(S){var F=S.features||{};
  if(off('guides')){hideLinks('guides/');if(IN_GUIDES)closePage()}
  if(off('adslots'))$$('.ad-slot-wrap').forEach(function(e){e.hidden=true});
  if(off('share'))$$('.share-box').forEach(function(e){e.hidden=true});
- if(off('mapview'))$$('[data-view]').forEach(function(e){e.parentElement.hidden=true});
+ if(off('water'))$$('[data-feature="water"]').forEach(function(e){e.hidden=true});
+ if(off('mapview'))$$('[data-view]').forEach(function(e){(e.closest('.dir-viewbar')||e.parentElement).hidden=true});
  ['health','beauty','dining','groceries','legal','finance','home','education'].forEach(function(k){if(off('cat_'+k))$$('a[href$="directory.html?cat='+k+'"]').forEach(function(e){e.hidden=true})});
  [['form_business','lyb-form'],['form_advertise','ad-form'],['form_giveaway','gw-form']].forEach(function(x){var f=document.getElementById(x[1]);if(f&&off(x[0])){var p=document.createElement('p');p.className='status cms-form-off';p.dataset.cms='form-off';p.innerHTML=bi({tw:'此表單目前暫停收件。',en:'This form is not accepting entries right now.'});f.replaceWith(p);relang(p)}});
  if(url(S.waGroup))$$('.join .tbd').forEach(function(e){var a=document.createElement('a');a.href=url(S.waGroup);a.target='_blank';a.rel='noopener';a.className='btn wa';a.innerHTML=bi({tw:'加入群組',en:'Join group'});e.replaceWith(a);relang(a)});

@@ -90,6 +90,28 @@ service cloud.firestore {
       allow create, update: if isOwner() && request.resource.data.role in ['owner', 'editor'] && audited();
       allow delete: if isOwner() && uid != request.auth.uid;
     }
+    // 商家統計：公開訪客只能「小量遞增」計數欄位，不能讀、不能刪、不能寫其他欄位。不存任何個資。
+    // 文件 ID = 商家ID_YYYYMMDD。上限需與 assets/stats.js 的 MAX 同步。
+    function statKeys() { return ['views', 'click_whatsapp', 'click_call', 'click_website', 'dwell_ms_total', 'dwell_samples']; }
+    function incOk(f, max, old) {
+      return !request.resource.data.keys().hasAny([f])
+        || (request.resource.data[f] is int && request.resource.data[f] - old >= 0 && request.resource.data[f] - old <= max);
+    }
+    function statsOk(isNew) {
+      return incOk('views', 50, isNew ? 0 : resource.data.get('views', 0))
+        && incOk('click_whatsapp', 20, isNew ? 0 : resource.data.get('click_whatsapp', 0))
+        && incOk('click_call', 20, isNew ? 0 : resource.data.get('click_call', 0))
+        && incOk('click_website', 20, isNew ? 0 : resource.data.get('click_website', 0))
+        && incOk('dwell_ms_total', 600000, isNew ? 0 : resource.data.get('dwell_ms_total', 0))
+        && incOk('dwell_samples', 50, isNew ? 0 : resource.data.get('dwell_samples', 0));
+    }
+    match /stats_daily/{id} {
+      allow read: if isAdmin();
+      allow create: if id.matches('^[A-Za-z0-9_-]{1,60}_[0-9]{8}$')
+        && request.resource.data.keys().hasOnly(statKeys()) && statsOk(true);
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(statKeys()) && statsOk(false);
+      allow delete: if isOwner();
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

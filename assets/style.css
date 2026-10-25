@@ -209,3 +209,16 @@ a.cms-banner:hover{border-color:var(--n-color-accent)}
 .cms-banner--warn{border-color:var(--n-color-warning);font-weight:var(--n-fw-bold)}
 .cms-closed{padding:var(--n-space-10) var(--n-space-4);text-align:center}
 .cms-closed p{color:var(--n-color-text-muted);margin:var(--n-space-4) 0}
+/* 今日停水停電卡片 */
+.n-water{display:flex;align-items:center;gap:var(--n-space-3);margin:var(--n-space-4) 0;padding:var(--n-space-3) var(--n-space-4);border:1px solid var(--n-neon-cyan);border-left-width:6px;border-radius:var(--n-radius-md,12px);background:var(--n-color-surface);color:var(--n-color-text);text-decoration:none}
+.n-water:hover,.n-water:focus-visible{background:color-mix(in srgb,var(--n-neon-cyan) 12%,var(--n-color-surface))}
+.n-water__icon{font-size:1.5rem;flex:none}.n-water__body{display:grid;gap:2px;flex:1;min-width:0}.n-water__sub{font-size:var(--n-fs-sm);color:var(--n-color-text-muted)}.n-water__go{font-size:1.25rem;flex:none}
+/* 商家頁 列表／地圖 分段切換（與分類 chip 樣式不同） */
+.dir-viewbar{display:flex;align-items:center;justify-content:space-between;gap:var(--n-space-3);margin:var(--n-space-4) 0 var(--n-space-2)}
+.dir-viewbar__label{font-size:var(--n-fs-sm);color:var(--n-color-text-muted)}
+.view-seg{display:inline-flex;padding:3px;border-radius:10px;background:var(--n-color-border);gap:2px}
+.view-seg .seg{display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:600;border:0;border-radius:8px;padding:.45rem 1rem;background:transparent;color:var(--n-color-text-muted);cursor:pointer;min-height:40px}
+.view-seg .seg.active{background:var(--n-color-surface);color:var(--n-color-text);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.view-seg .seg:focus-visible{outline:2px solid var(--n-color-accent);outline-offset:2px}
+.dir-viewbar+.dir-toolbar{margin-top:var(--n-space-2)}
+.gc-count{font-size:var(--n-fs-xs);opacity:.85}
