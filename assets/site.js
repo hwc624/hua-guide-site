@@ -17,16 +17,21 @@ document.querySelectorAll('#catclear').forEach(a=>a.addEventListener('click',e=>
  if(DIR_SUBS[cq])dirF={t:'sub',k:cq};else if(DIR_GROUPS.includes(cq))dirF={t:'group',k:cq};
  if(document.getElementById('dir')){applyDir(false);if(cq&&dirF.t==='all'){const u=new URL(location.href);u.searchParams.delete('cat');history.replaceState(null,'',u)}}}
 const wa=document.getElementById('wa-share');if(wa)wa.href='https://wa.me/?text='+encodeURIComponent(document.title+' '+location.href);
+/* ---------- 表單錯誤框：醒目 + 捲動 + 聚焦第一個錯誤欄位 ---------- */
+function showErrs(box,form,errs){const H={tw:'⚠️ 還不能送出，請修正以下欄位：',cn:'⚠️ 还不能送出，请修正以下栏位：',en:'⚠️ Not sent yet – please fix the following:'};
+ if(!errs.length){box.innerHTML='';box.classList.remove('is-shown');return}
+ box.innerHTML='<p class="errors__title">'+(H[window.__lang]||H.tw)+'</p><ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>';box.classList.add('is-shown');
+ box.scrollIntoView({block:'center',behavior:'smooth'});const f=form.querySelector('.invalid');if(f)try{f.focus({preventScroll:true})}catch(_){}}
 const gw=document.getElementById('gw-form');
 if(gw){gw.addEventListener('submit',e=>{e.preventDefault();const errs=[];const st=document.getElementById('gw-status');st.hidden=true;
  const chk=(n,ok,msg)=>{gw.elements[n].classList.toggle('invalid',!ok);if(!ok)errs.push(msg)};
  chk('name',gw.elements.name.value.trim()!=='','請填名字 Name is required');
  chk('whatsapp',/^\+?[0-9 ()-]{9,20}$/.test(gw.elements.whatsapp.value.trim()),'WhatsApp 號碼格式不正確 Invalid WhatsApp number');
  chk('consent',gw.elements.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
- document.getElementById('gw-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
+ showErrs(document.getElementById('gw-errors'),gw,errs);
  if(!errs.length)sendForm('giveaway',gw,{name:gw.elements.name.value.trim(),whatsapp:gw.elements.whatsapp.value.trim(),consent:true,marketing:gw.elements.marketing.checked},st)});}
 /* ---------- 送到 Firebase：forms.js 只在按送出時才載入 ---------- */
-function sendForm(kind,form,data,st,file){import(new URL(ASSET+'forms.js',location.href).href).then(m=>m.submit(kind,form,data,st,file)).catch(e=>{console.error(e);st.textContent=window.__lang==='en'?'Could not send – please try again later.':window.__lang==='cn'?'送出失败，请稍后再试。':'送出失敗，請稍後再試。';st.dataset.state='error';st.hidden=false})}
+function sendForm(kind,form,data,st,file){import(new URL(ASSET+'forms.js',location.href).href).then(m=>m.submit(kind,form,data,st,file)).catch(e=>{console.error(e);st.textContent=window.__lang==='en'?'Could not send – please try again later.':window.__lang==='cn'?'送出失败，请稍后再试。':'送出失敗，請稍後再試。';st.dataset.state='error';st.setAttribute('role','alert');st.hidden=false;st.scrollIntoView({block:'center',behavior:'smooth'})})}
 const adf=document.getElementById('ad-form');
 if(adf){adf.addEventListener('submit',e=>{e.preventDefault();const errs=[];const st=document.getElementById('form-status');st.hidden=true;const E=adf.elements;
  const chk=(n,ok,msg)=>{E[n].classList.toggle('invalid',!ok);if(!ok)errs.push(msg)};
@@ -34,7 +39,7 @@ if(adf){adf.addEventListener('submit',e=>{e.preventDefault();const errs=[];const
  chk('email',/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(E.email.value.trim()),'Email 格式不正確 Invalid email');
  chk('phone',E.phone.value.trim()===''||/^\+?[0-9 ()-]{7,20}$/.test(E.phone.value.trim()),'電話格式不正確 Invalid phone');
  chk('consent',E.consent.checked,'請勾選個資同意 Please tick the POPIA consent');
- document.getElementById('form-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
+ showErrs(document.getElementById('form-errors'),adf,errs);
  if(!errs.length)sendForm('advertise',adf,{name:E.name.value.trim(),business:E.business.value.trim(),email:E.email.value.trim(),phone:E.phone.value.trim(),plan:E.plan.value,message:E.message.value.trim(),consent:true},st)})}
 const NP=u=>u.replace(/\/$/,'/index.html');const here=NP(location.pathname);document.querySelectorAll('.bottom-nav a, .site-nav a').forEach(a=>{if(NP(new URL(a.href).pathname)===here)a.setAttribute('aria-current','page')});
 const ss=document.getElementById('site-search');
@@ -72,7 +77,7 @@ if(ly){const pv=document.getElementById('lyb-preview');ly.elements.photo.addEven
  chk('whatsapp',E.whatsapp.value.trim()===''||tel(E.whatsapp.value.trim()),'WhatsApp 號碼格式不正確 Invalid WhatsApp');
  chk('hours',E.hours.value.trim()!=='','請填營業時間 Hours required');chk('desc',E.desc.value.trim()!=='','請填簡介 Description required');
  chk('consent',E.consent.checked,'請勾選個資書面同意 Please tick the POPIA consent');
- document.getElementById('lyb-errors').innerHTML=errs.length?'<ul>'+errs.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'';
+ showErrs(document.getElementById('lyb-errors'),ly,errs);
  if(!errs.length)sendForm('business',ly,{bname:E.bname.value.trim(),category:E.category.value,address:E.address.value.trim(),phone:E.phone.value.trim(),whatsapp:E.whatsapp.value.trim(),hours:E.hours.value.trim(),desc:E.desc.value.trim(),consent:true},st,E.photo.files[0])})}
 /* ---------- 繁簡切換 (opencc-js, tw→cn, 延遲載入) ---------- */
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}

@@ -37,14 +37,21 @@ async function uploadPhoto(file) {
 }
 /* kind: business | advertise | giveaway；form 有 honeypot 欄位 name="website" */
 export async function submit(kind, form, data, statusEl, file) {
-  const show = (m, cls) => { statusEl.textContent = m; statusEl.dataset.state = cls; statusEl.hidden = false; };
   const btn = form.querySelector('[type=submit]');
+  const ICON = { ok: '✅ ', error: '⚠️ ', busy: '⏳ ' };
+  const show = (m, cls) => {
+    statusEl.textContent = ICON[cls] + m; statusEl.dataset.state = cls; statusEl.hidden = false;
+    statusEl.setAttribute('role', cls === 'error' ? 'alert' : 'status'); statusEl.setAttribute('aria-live', cls === 'error' ? 'assertive' : 'polite');
+    if (cls !== 'busy') statusEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  };
+  const btnHTML = btn.innerHTML;
+  const busy = on => { btn.disabled = on; btn.setAttribute('aria-busy', String(on)); if (on) btn.textContent = t('sending'); else btn.innerHTML = btnHTML; };
   if (form.elements.website && form.elements.website.value) { show(t(OKMSG[kind]), 'ok'); form.reset(); return; } // 機器人：假裝成功
   const rk = 'hg_sub_' + kind, now = Date.now();
   try { if (now - Number(localStorage.getItem(rk) || 0) < 60000) { show(t('wait'), 'error'); return; } } catch (_) {}
   if (file && (!PHOTO_TYPES[file.type] || file.size >= 5 * 1024 * 1024)) { show(t('big'), 'error'); return; }
   if (!configured) { show(t('off'), 'error'); return; }
-  btn.disabled = true; show(t('sending'), 'busy');
+  busy(true); show(t('sending'), 'busy');
   try {
     const { db, fs } = await init();
     let extra = '';
@@ -54,5 +61,5 @@ export async function submit(kind, form, data, statusEl, file) {
     show(t(OKMSG[kind]) + extra, 'ok'); form.reset();
     const pv = document.getElementById('lyb-preview'); if (pv) pv.hidden = true;
   } catch (e) { console.error(e); show(t('err'), 'error'); }
-  finally { btn.disabled = false; }
+  finally { busy(false); }
 }
