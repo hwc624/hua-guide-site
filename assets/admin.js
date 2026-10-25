@@ -133,7 +133,7 @@ function edit(name, id, data) {
     const val = { ...collect(body), ...audit() };
     if (name === 'merchants' && !val.name?.tw) throw new Error('請填商家名稱（繁中）');
     const nid = id || $('[data-newid]', body).value.trim();
-    if (nid && !/^[a-z0-9-]{1,60}$/.test(nid)) throw new Error('ID 格式不對');
+    if (!id && nid && !/^[a-z0-9-]{1,60}$/.test(nid)) throw new Error('ID 格式不對');
     if (id) await F.setDoc(F.doc(db, name, id), val, { merge: true });
     else if (nid) { if ((await F.getDoc(F.doc(db, name, nid))).exists()) throw new Error('這個 ID 已經有了'); await F.setDoc(F.doc(db, name, nid), val); }
     else await F.addDoc(F.collection(db, name), val);
