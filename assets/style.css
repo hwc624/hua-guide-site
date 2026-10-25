@@ -236,3 +236,6 @@ html.m-en .n-catgrid__item{font-size:var(--n-fs-sm,.875rem)}
 .n-dealstrip__body{display:flex;flex-direction:column;gap:4px;padding:var(--n-space-3)}.n-dealstrip__offer{color:var(--n-color-accent)}
 @media(min-width:900px){.n-dealstrip__row{grid-auto-columns:calc((100% - 3*var(--n-space-2))/4)}}
 .dir-empty{padding:var(--n-space-4);text-align:center}.dir-empty[hidden]{display:none}
+/* cats-onerow: always one row; ≥1024 all 12 fit, below = scroll row */
+@media(min-width:900px){.n-catgrid{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:calc((100% - 7*var(--n-space-2))/7.4);overflow-x:auto;scroll-snap-type:x mandatory}.n-catgrid__item{font-size:var(--n-fs-sm,.875rem)}.n-catgrid__icon{font-size:30px}}
+@media(min-width:1024px){.n-catgrid{grid-auto-columns:auto;grid-template-columns:repeat(12,minmax(0,1fr));overflow:visible;scroll-snap-type:none;gap:6px}.n-catgrid__item{min-height:80px;padding:12px 2px 10px;gap:6px;font-size:13px;line-height:1.2}.n-catgrid__icon{font-size:30px}html.m-en .n-catgrid__item{font-size:12px}}
