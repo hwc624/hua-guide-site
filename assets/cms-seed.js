@@ -55,7 +55,7 @@ export const site = {
     announcement: { on: false, tw: '', en: '', link: '' },
     maintenance: { on: false, tw: '網站維護中，部分功能暫停。', en: 'Site maintenance in progress – some features are paused.' },
     features: { carousel: true, deals: true, giveaway: true, guides: true, life: true, form_business: true, form_advertise: true, form_giveaway: true, adslots: true, share: true, mapview: true, water: true, board: false,
-      cat_health: true, cat_beauty: true, cat_dining: true, cat_groceries: true, cat_legal: true, cat_finance: true, cat_home: true, cat_education: true },
+      cat_health: true, cat_beauty: true, cat_dining: true, cat_groceries: true, cat_legal: true, cat_finance: true, cat_home: true, cat_education: true, cat_trade: true, cat_travel: true, cat_community: true },
     hidden: []
   },
   advertise: {

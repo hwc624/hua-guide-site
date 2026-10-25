@@ -1,5 +1,5 @@
 /* ---------- 目錄篩選：大類 chip (food/services/other) + 細分類 ?cat= ---------- */
-const DIR_SUBS={health:'services',beauty:'services',dining:'food',groceries:'food',legal:'services',finance:'services',home:'services',education:'other'};
+const DIR_SUBS={health:'services',beauty:'services',dining:'food',groceries:'food',legal:'services',finance:'services',home:'services',education:'other',trade:'services',travel:'other',community:'other'};
 const DIR_GROUPS=['food','services','other'];let dirF={t:'all'};
 function dirMatch(cat,sub){return dirF.t==='all'||(dirF.t==='group'?cat===dirF.k:sub===dirF.k)}
 function applyDir(push){const dir=document.getElementById('dir');if(!dir)return;let n=0;

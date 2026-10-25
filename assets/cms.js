@@ -60,7 +60,7 @@ function applySettings(S){var F=S.features||{};
  if(off('share'))$$('.share-box').forEach(function(e){e.hidden=true});
  if(off('water'))$$('[data-feature="water"]').forEach(function(e){e.hidden=true});
  if(off('mapview'))$$('[data-view]').forEach(function(e){(e.closest('.dir-viewbar')||e.parentElement).hidden=true});
- ['health','beauty','dining','groceries','legal','finance','home','education'].forEach(function(k){if(off('cat_'+k))$$('a[href$="directory.html?cat='+k+'"]').forEach(function(e){e.hidden=true})});
+ ['health','beauty','dining','groceries','legal','finance','home','education','trade','travel','community'].forEach(function(k){if(off('cat_'+k))$$('a[href$="directory.html?cat='+k+'"]').forEach(function(e){e.hidden=true})});
  [['form_business','lyb-form'],['form_advertise','ad-form'],['form_giveaway','gw-form']].forEach(function(x){var f=document.getElementById(x[1]);if(f&&off(x[0])){var p=document.createElement('p');p.className='status cms-form-off';p.dataset.cms='form-off';p.innerHTML=bi({tw:'此表單目前暫停收件。',en:'This form is not accepting entries right now.'});f.replaceWith(p);relang(p)}});
  if(url(S.waGroup))$$('.join .tbd').forEach(function(e){var a=document.createElement('a');a.href=url(S.waGroup);a.target='_blank';a.rel='noopener';a.className='btn wa';a.innerHTML=bi({tw:'加入群組',en:'Join group'});e.replaceWith(a);relang(a)});
  if(url(S.waChannel))$$('.n-feature').forEach(function(card){if(/WHATSAPP/.test(card.textContent)&&card.tagName!=='A'){var b=card.querySelector('.n-btn');if(b){var a=document.createElement('a');a.className=b.className;a.href=url(S.waChannel);a.target='_blank';a.rel='noopener';a.innerHTML=bi({tw:'加入頻道 →',en:'Join channel →'});b.replaceWith(a);relang(a)}}});
@@ -105,6 +105,13 @@ function applyDeals(list){var g=$('.grid.deals');if(!g)return;
   +(has(d.meta)?'<p class="meta">'+bi(d.meta)+'</p>':'')+(url(d.website)?'<a class="btn" href="'+esc(rel(d.website))+'"'+ext(d.website)+' data-track="website" data-biz="'+esc(d.biz&&d.biz.tw||'')+'">'+bi({tw:'官網 ↗',en:'Website ↗'})+'</a>':'')
   +(has(d.note)?'<p class="act-note">'+bi(d.note)+'</p>':'')+'</article>'}).join('');relang(g)}
 
+/* ---------- 首頁「本週好康」條 ---------- */
+function applyHomeDeals(list){var w=document.getElementById('home-deals'),r=document.getElementById('home-deals-row');if(!w||!r)return;
+ list=(list||[]).filter(function(d){return (d.tags||[]).indexOf('sample')<0}).sort(function(a,b){return (a.order||0)-(b.order||0)}).slice(0,8);
+ if(!list.length){w.hidden=true;return}
+ r.innerHTML=list.map(function(d){var img=url(d.image);return '<a class="n-card n-dealstrip__item" href="deals.html" data-cms-id="'+esc(d.id)+'">'+(img?'<img src="'+esc(rel(img))+'" alt="" width="800" height="600" loading="lazy" decoding="async">':'')+'<span class="n-dealstrip__body"><strong>'+bi(d.biz)+'</strong>'+(has(d.offer)?'<span class="n-dealstrip__offer">'+bi(d.offer)+'</span>':'')+'</span></a>'}).join('');
+ w.hidden=false;relang(w)}
+
 /* ---------- 文章（生活資訊 / 指南） ---------- */
 function paras(o){var tw=String(o&&o.tw||'').split(/\n{2,}/),en=String(o&&(o.en||o.tw)||'').split(/\n{2,}/);var n=Math.max(tw.length,en.length),h='';for(var i=0;i<n;i++)h+='<p class="bi">'+bi({tw:tw[i]||'',en:en[i]||''})+'</p>';return h}
 function applyArticles(list){
@@ -133,6 +140,7 @@ getSite().then(function(site){var S=site.settings;
  if(document.getElementById('dir')||$('.n-split article.n-card--merchant'))jobs.push(query('merchants','published').then(applyMerchants));
  if($('.n-hero[data-carousel]'))jobs.push(query('slides','enabled').then(applySlides));
  if($('.grid.deals'))jobs.push(query('deals','published').then(applyDeals));
+ if(document.getElementById('home-deals'))jobs.push(query('deals','published').then(applyHomeDeals));
  if($('.grid.life')||(IN_GUIDES&&PAGE==='index')||PAGE==='article')jobs.push(query('articles','published').then(applyArticles));
  return Promise.all(jobs).then(function(){done('live')})
 }).catch(function(e){console.warn('[cms] 用靜態備援 static fallback:',e&&e.message);done('fallback',e)});

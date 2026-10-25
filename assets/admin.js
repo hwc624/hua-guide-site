@@ -16,7 +16,7 @@ let me = null, role = null;
 
 /* ---------- 欄位定義 ---------- */
 const GROUPS = [['food', '餐飲 Food'], ['services', '生活服務 Services'], ['other', '其他 Other']];
-const SUBS = [['', '（無細分類）'], ['health', '醫療健康'], ['beauty', '美容美髮'], ['dining', '餐飲美食'], ['groceries', '超市購物'], ['legal', '法律簽證'], ['finance', '財稅金融'], ['home', '房屋居家'], ['education', '教育翻譯']];
+const SUBS = [['', '（無細分類）'], ['health', '醫療健康'], ['beauty', '美容美髮'], ['dining', '餐飲美食'], ['groceries', '超市購物'], ['legal', '法律簽證'], ['finance', '財稅金融'], ['home', '房屋居家'], ['education', '教育翻譯'], ['trade', '交通貿易'], ['travel', '休閒旅遊'], ['community', '社團宗教']];
 const TAGS = { featured: '精選', affiliate: '經營者關係企業', sample: '範例（虛構必勾）', ad: '廣告', event: '活動' };
 const COLL = {
   merchants: { label: '商家', pub: 'published', cols: [['name.tw', '名稱'], ['group', '大類'], ['sub', '細分類'], ['featuredHome', '首頁精選'], ['order', '順序']], fields: [
