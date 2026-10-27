@@ -248,3 +248,7 @@ html.m-en .n-catgrid__item{font-size:var(--n-fs-sm,.875rem)}
 .status[data-state=error]{border-color:#dc2626;background:rgba(220,38,38,.12);color:#f87171}
 .status[data-state=busy]{border-color:var(--n-color-border,#444)}
 button[type=submit][aria-busy=true]{opacity:.7;cursor:progress}
+
+/* 點擊目標至少 32px 高（頁尾連結、生活頁聯絡連結）*/
+.n-footer a,.site-footer a{display:inline-block;padding:7px 0;min-height:32px;box-sizing:border-box}
+article.card li>a,article.card p>a:not(.btn):not([class]){display:inline-block;padding:5px 0;min-height:32px;box-sizing:border-box}

@@ -10,7 +10,8 @@ const esc = s => String(s ?? '').replace(/[&"<>']/g, c => ({ '&': '&amp;', '"': 
 const getP = (o, p) => p.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
 const setP = (o, p, v) => { const ks = p.split('.'); let a = o; ks.slice(0, -1).forEach(k => { if (typeof a[k] !== 'object' || a[k] === null) a[k] = {}; a = a[k]; }); a[ks.at(-1)] = v; };
 const fmtT = t => (t && t.toDate ? t.toDate().toLocaleString('zh-TW', { timeZone: 'Africa/Johannesburg', hour12: false }) : '');
-const IMGS = ['p-cargo', 'p-dumplings', 'p-gift', 'p-health', 'p-jipai', 'p-megaphone', 'p-night', 'p-shop', 'p-tea'].map(n => 'assets/img/' + n + '.webp');
+const IMGS = ['p-cargo', 'p-dumplings', 'p-gift', 'p-health', 'p-jipai', 'p-megaphone', 'p-night', 'p-shop', 'p-tea'].map(n => 'assets/img/' + n + '.webp').concat(['assets/img/nanhua-temple.jpg']);
+const IMG_STRIP = `<div class="ad-pick" role="group" aria-label="選一張現有圖片">${IMGS.map(i => `<button type="button" class="ad-pick-i" data-pickimg="${i}" title="${i.split('/').pop()}"><img alt="${i.split('/').pop()}" loading="lazy" src="${i}"></button>`).join('')}</div>`;
 $('#imgs').innerHTML = IMGS.map(i => `<option value="${i}">`).join('');
 let me = null, role = null;
 
@@ -69,7 +70,7 @@ function fieldHtml(path, label, type, opt, val) {
     case 'bool': return `<div class="ad-field"><label class="ad-check"><input type="checkbox" data-p="${path}" data-t="bool" ${val ? 'checked' : ''}> ${esc(label)}</label></div>`;
     case 'select': return `<div class="ad-field"><label for="${id}">${esc(label)}</label><select id="${id}" data-p="${path}">${opt.map(([v, l]) => `<option value="${esc(v)}" ${v === (val ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
     case 'tags': return `<div class="ad-field">${L}${opt.map(t => `<label class="ad-check"><input type="checkbox" data-tag="${path}" value="${t}" ${(val || []).includes(t) ? 'checked' : ''}> ${esc(TAGS[t])}</label>`).join('')}</div>`;
-    case 'image': return `<div class="ad-field"><label for="${id}">${esc(label)}</label><input id="${id}" list="imgs" data-p="${path}" data-img value="${esc(val)}" placeholder="assets/img/… 或 https://…"><img class="ad-img" alt="" src="${esc(val || '')}" ${val ? '' : 'hidden'}><span class="ad-help">可選網站現有圖片，或貼外部圖片網址（Firebase Storage 尚未開通，暫不能直接上傳）。</span></div>`;
+    case 'image': return `<div class="ad-field"><label for="${id}">${esc(label)}</label><input id="${id}" list="imgs" data-p="${path}" data-img value="${esc(val)}" placeholder="assets/img/… 或 https://…"><img class="ad-img" alt="" src="${esc(val || '')}" ${val ? '' : 'hidden'}><span class="ad-help">點下面的縮圖選網站現有圖片，或貼外部圖片網址（Firebase Storage 尚未開通，暫不能直接上傳）。</span>${IMG_STRIP}</div>`;
     case 'features': return `<fieldset><legend>${esc(label)}</legend>${FEATURES.map(([k, l]) => `<label class="ad-check"><input type="checkbox" data-p="${path}.${k}" data-t="bool" ${val?.[k] !== false ? 'checked' : ''}> ${esc(l)}</label>`).join('<br>')}</fieldset>`;
     case 'blocks': return `<fieldset data-blocks="${path}"><legend>${esc(label)}（勾選＝隱藏）</legend><p class="ad-help">載入中…</p></fieldset>`;
     case 'list': return `<fieldset data-list="${path}"><legend>${esc(label)}</legend><div class="items">${(val || []).map(v => listItem(opt, v)).join('')}</div><button type="button" data-add>＋ 新增一筆</button></fieldset>`;
@@ -79,6 +80,7 @@ function listItem(sub, v) {
   return `<div class="ad-list-item">${sub.map(([k, l, t, o]) => fieldHtml(k ? '@.' + k : '@', l, t, o, k ? v?.[k] : v)).join('')}<div class="ad-row"><button type="button" data-up>↑</button><button type="button" data-down>↓</button><button type="button" class="danger" data-del>刪除這筆</button></div></div>`;
 }
 function wire(root, fields, data) {
+  root.addEventListener('click', e => { const b = e.target.closest('[data-pickimg]'); if (!b) return; const inp = b.closest('.ad-field').querySelector('[data-img]'); inp.value = b.dataset.pickimg; inp.dispatchEvent(new Event('input', { bubbles: true })); $$('.ad-pick-i', b.parentElement).forEach(x => x.classList.toggle('on', x === b)); });
   root.addEventListener('input', e => { if (e.target.matches('[data-img]')) { const im = e.target.parentElement.querySelector('img'); im.src = e.target.value; im.hidden = !e.target.value; } });
   root.addEventListener('click', e => {
     const fs = e.target.closest('[data-list]'); if (!fs) return; const it = e.target.closest('.ad-list-item');
@@ -176,6 +178,7 @@ async function viewSubs() {
    ${subKind === 'business' ? '<p class="ad-help">按「通過並刊登」會自動建立一筆已發布的商家，馬上出現在商家目錄；之後可到「商家」補英文、圖片。</p>' : ''}<div id="subs">載入中…</div>`;
   $$('[data-k]', v).forEach(b => b.onclick = () => { subKind = b.dataset.k; viewSubs(); });
   $('#st').onchange = e => { subStatus = e.target.value; viewSubs(); };
+  refreshPending();
   const q = subStatus === 'all' ? F.collection(db, S.coll) : F.query(F.collection(db, S.coll), F.where('status', '==', subStatus));
   const rows = (await F.getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   const pill = s => `<span class="pill ${s === 'approved' ? 'ok' : s === 'rejected' ? 'no' : 'wait'}">${{ approved: '已通過', rejected: '已拒絕', pending: '待審核' }[s] || s}</span>`;
@@ -304,7 +307,18 @@ function report(biz, rows, names) {
 /* ---------- 路由與登入 ---------- */
 const TABS = [['subs', '送件審核', viewSubs], ['merchants', '商家', () => viewColl('merchants')], ['slides', '首頁輪播', () => viewColl('slides')], ['deals', '優惠', () => viewColl('deals')], ['articles', '文章／生活資訊', () => viewColl('articles')],
   ['advertise', '廣告方案', () => viewSite('advertise')], ['giveaway', '抽獎內容', () => viewSite('giveaway')], ['stats', '商家統計', () => viewStats()], ['settings', '網站設定與開關', () => viewSite('settings')], ['admins', '管理員', viewAdmins]];
-function go(k) { $$('#tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === k)); const t = TABS.find(x => x[0] === k) || TABS[0]; history.replaceState(null, '', '#' + t[0]); t[2]().catch(err => { console.error(err); $('#view').innerHTML = `<p class="ad-msg">讀取失敗：${esc(err.code || err.message)}</p>`; }); }
+async function refreshPending() {
+  try {
+    const counts = {};
+    await Promise.all(Object.entries(SUB).map(async ([k, c]) => { counts[k] = (await F.getDocs(F.query(F.collection(db, c.coll), F.where('status', '==', 'pending')))).size; }));
+    const n = Object.values(counts).reduce((a, b) => a + b, 0);
+    const tb = $('#tabs [data-tab=subs]'); if (tb) tb.textContent = '送件審核' + (n ? ` (${n})` : '');
+    $$('#view [data-k]').forEach(b => { const c = counts[b.dataset.k]; b.textContent = SUB[b.dataset.k].label + (c ? ` (${c})` : ''); });
+    document.title = (n ? `(${n}) ` : '') + document.title.replace(/^\(\d+\) /, '');
+  } catch (_) {}
+}
+function go(k) {
+  refreshPending(); $$('#tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === k)); const t = TABS.find(x => x[0] === k) || TABS[0]; history.replaceState(null, '', '#' + t[0]); t[2]().catch(err => { console.error(err); $('#view').innerHTML = `<p class="ad-msg">讀取失敗：${esc(err.code || err.message)}</p>`; }); }
 $('#tabs').innerHTML = TABS.map(([k, l]) => `<button type="button" data-tab="${k}">${l}</button>`).join('') + `<a href="index.html${useEmulator ? '?emu=1' : ''}" target="_blank" rel="noopener" style="margin-left:auto;align-self:center">看網站 ↗</a>`;
 $('#tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); };
 $('#login-form').onsubmit = async e => { e.preventDefault(); const f = e.target.elements; $('#login-msg').textContent = ''; try { await A.signInWithEmailAndPassword(auth, f.email.value.trim(), f.password.value); } catch (err) { $('#login-msg').textContent = '登入失敗：' + (err.code || err.message); } };
