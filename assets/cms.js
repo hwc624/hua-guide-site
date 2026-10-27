@@ -84,7 +84,8 @@ function homeCard(m){var t=m.tags||[],img=url(m.homeImage||m.image);
   +'<div class="n-card__body"><span class="n-card__tags"><span class="n-tag n-tag--red">'+bi({tw:'精選',en:'Featured'})+'</span>'+(t.indexOf('affiliate')>=0?'<span class="n-tag n-tag--affiliate">'+bi({tw:'經營者關係企業',en:'Affiliated with the site operator'})+'</span>':'')+(t.indexOf('sample')>=0?'<span class="n-tag n-tag--sample">範例 / Sample</span>':'')+'</span>'
   +'<h3 class="n-card__title">'+bi(m.name)+'</h3>'+(has(m.homeDesc||m.desc)?'<p class="n-card__meta">'+bi(has(m.homeDesc)?m.homeDesc:m.desc)+'</p>':'')+(has(m.note)?'<p class="act-note">'+bi(m.note)+'</p>':'')
   +'<div class="n-card__actions">'+bizActions(m,'n-btn n-btn--primary n-btn--sm')+'</div></div></article>'}
-function applyMerchants(list){var dir=document.getElementById('dir');
+function sampleLast(list){var sm=function(x){return (x.tags||[]).indexOf('sample')>=0?1:0};return list.map(function(x,i){return [x,i]}).sort(function(a,b){return sm(a[0])-sm(b[0])||a[1]-b[1]}).map(function(p){return p[0]})}
+function applyMerchants(list){list=sampleLast(list);var dir=document.getElementById('dir');
  if(dir){dir.innerHTML=list.map(bizCard).join('');relang(dir);if(window.__hgApplyDir)window.__hgApplyDir()}
  var feat=$('.n-split article.n-card--merchant');if(feat){var f=list.filter(function(m){return m.featuredHome});var w=document.createElement('div');w.innerHTML=f.map(homeCard).join('');
   var nodes=[].slice.call(w.children);nodes.forEach(function(n){feat.parentNode.insertBefore(n,feat)});feat.remove();nodes.forEach(relang)}}
@@ -94,7 +95,7 @@ function applySlides(list){var root=$('.n-hero[data-carousel]');if(!root||root.d
  var s=list.filter(function(x){return (!x.start||x.start<=now)&&(!x.end||x.end>=now)});window.HGCarousel.mount(s,true);relang(root)}
 
 /* ---------- 優惠 ---------- */
-function applyDeals(list){var g=$('.grid.deals');if(!g)return;
+function applyDeals(list){var g=$('.grid.deals');if(!g)return;list=sampleLast(list);
  g.innerHTML=list.map(function(d){var t=d.tags||[],img=url(d.image);
   return '<article class="card deal'+(t.indexOf('featured')>=0?' featured':'')+(t.indexOf('sample')>=0?' sample':'')+'" data-cms-id="'+esc(d.id)+'">'+(img?'<div class="ph ph-img"><img src="'+esc(rel(img))+'" alt="" width="800" height="600" loading="lazy" decoding="async">'+(d.imageAi?AI:'')+'</div>':'')
   +'<div class="badges">'+(t.indexOf('affiliate')>=0?'<span class="badge affil">'+bi({tw:'經營者關係企業',en:'Affiliated with the site operator'})+'</span>':'')+(t.indexOf('featured')>=0?'<span class="badge feat">本週優惠 Deal</span>':'')+(t.indexOf('sample')>=0?'<span class="badge sample-b">範例 / Sample</span>':'')+'</div>'
@@ -110,6 +111,7 @@ function applyHomeDeals(list){var w=document.getElementById('home-deals'),r=docu
  list=(list||[]).filter(function(d){return (d.tags||[]).indexOf('sample')<0}).sort(function(a,b){return (a.order||0)-(b.order||0)}).slice(0,8);
  if(!list.length){w.hidden=true;return}
  r.innerHTML=list.map(function(d){var img=url(d.image);return '<a class="n-card n-dealstrip__item" href="deals.html" data-cms-id="'+esc(d.id)+'">'+(img?'<img src="'+esc(rel(img))+'" alt="" width="800" height="600" loading="lazy" decoding="async">':'')+'<span class="n-dealstrip__body"><strong>'+bi(d.biz)+'</strong>'+(has(d.offer)?'<span class="n-dealstrip__offer">'+bi(d.offer)+'</span>':'')+'</span></a>'}).join('');
+ if(list.length<3){r.classList.add('n-dealstrip__row--few');r.insertAdjacentHTML('beforeend','<a class="n-card n-dealstrip__item n-dealstrip__invite" href="advertise.html"><span class="n-dealstrip__body"><strong>'+bi({tw:'你的優惠可以放在這裡',en:'Your deal could be here'})+'</strong><span class="n-dealstrip__offer">'+bi({tw:'免費刊登，了解方案 →',en:'Free to list. See plans →'})+'</span></span></a>')}else r.classList.remove('n-dealstrip__row--few');
  w.hidden=false;relang(w)}
 
 /* ---------- 文章（生活資訊 / 指南） ---------- */

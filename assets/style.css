@@ -252,3 +252,7 @@ button[type=submit][aria-busy=true]{opacity:.7;cursor:progress}
 /* 點擊目標至少 32px 高（頁尾連結、生活頁聯絡連結）*/
 .n-footer a,.site-footer a{display:inline-block;padding:7px 0;min-height:32px;box-sizing:border-box}
 article.card li>a,article.card p>a:not(.btn):not([class]){display:inline-block;padding:5px 0;min-height:32px;box-sizing:border-box}
+
+/* 本週好康少於 3 筆：卡片橫向撐開，補一張邀請卡，避免右側整片空白 */
+.n-dealstrip__invite{justify-content:center;border-style:dashed}
+@media(min-width:900px){.n-dealstrip__row--few{grid-auto-columns:minmax(220px,1fr)}.n-dealstrip__row--few .n-dealstrip__item img{height:180px}}

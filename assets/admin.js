@@ -119,7 +119,7 @@ async function viewColl(name) {
   $('#add').onclick = () => edit(name, null, {});
   const snap = await F.getDocs(F.collection(db, name));
   const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order || 0) - (b.order || 0));
-  $('#tbl').innerHTML = rows.length ? `<table><thead><tr>${C.cols.map(c => `<th>${c[1]}</th>`).join('')}<th>公開</th><th>最後修改</th><th></th></tr></thead><tbody>${rows.map(r => `<tr class="${r[C.pub] ? '' : 'off'}" data-id="${esc(r.id)}">${C.cols.map(c => { const x = getP(r, c[0]); return `<td>${typeof x === 'boolean' ? (x ? '✓' : '') : esc(x)}</td>`; }).join('')}<td><button data-toggle>${r[C.pub] ? '公開中 → 下架' : '未公開 → 發布'}</button></td><td class="ad-help">${esc(fmtT(r.updatedAt))}<br>${esc(r.updatedByEmail || '')}</td><td><button data-edit>編輯</button> <button data-copy>複製</button> <button class="danger" data-del>刪除</button></td></tr>`).join('')}</tbody></table>` : '<p>還沒有資料。可以先到「網站設定」匯入初始資料，或按「新增」。</p>';
+  $('#tbl').innerHTML = rows.length ? `<table><thead><tr>${C.cols.map(c => `<th>${c[1]}</th>`).join('')}<th>公開</th><th>最後修改</th><th></th></tr></thead><tbody>${rows.map(r => `<tr class="${r[C.pub] ? '' : 'off'}" data-id="${esc(r.id)}">${C.cols.map((c, ci) => { const x = getP(r, c[0]); return `<td>${typeof x === 'boolean' ? (x ? '✓' : '') : esc(x)}${ci === 0 ? warnHtml(name, r, C) : ''}</td>`; }).join('')}<td><button data-toggle>${r[C.pub] ? '公開中 → 下架' : '未公開 → 發布'}</button></td><td class="ad-help">${esc(fmtT(r.updatedAt))}<br>${esc(r.updatedByEmail || '')}</td><td><button data-edit>編輯</button> <button data-copy>複製</button> <button class="danger" data-del>刪除</button></td></tr>`).join('')}</tbody></table>` : '<p>還沒有資料。可以先到「網站設定」匯入初始資料，或按「新增」。</p>';
   $('#tbl').onclick = async e => {
     const tr = e.target.closest('tr[data-id]'); if (!tr) return; const r = rows.find(x => x.id === tr.dataset.id);
     if (e.target.matches('[data-edit]')) edit(name, r.id, r);
@@ -307,6 +307,15 @@ function report(biz, rows, names) {
 /* ---------- 路由與登入 ---------- */
 const TABS = [['subs', '送件審核', viewSubs], ['merchants', '商家', () => viewColl('merchants')], ['slides', '首頁輪播', () => viewColl('slides')], ['deals', '優惠', () => viewColl('deals')], ['articles', '文章／生活資訊', () => viewColl('articles')],
   ['advertise', '廣告方案', () => viewSite('advertise')], ['giveaway', '抽獎內容', () => viewSite('giveaway')], ['stats', '商家統計', () => viewStats()], ['settings', '網站設定與開關', () => viewSite('settings')], ['admins', '管理員', viewAdmins]];
+/* 內容完整度提醒：公開中的資料若有空圖、範例標籤、待補字樣就標出來 */
+function warnHtml(name, r, C) {
+  if (!r[C.pub]) return '';
+  const w = [], txt = JSON.stringify(r);
+  if (C.fields.some(f => f[0] === 'image') && !r.image) w.push('沒有圖片');
+  if ((r.tags || []).includes('sample')) w.push('範例資料公開中');
+  if (/待補|待確認|待提供|TBD/i.test(txt)) w.push('有「待補／待確認」字樣');
+  return w.length ? `<br><span class="pill wait" title="公開網站上訪客看得到這些">⚠ ${w.map(esc).join('、')}</span>` : '';
+}
 async function refreshPending() {
   try {
     const counts = {};
